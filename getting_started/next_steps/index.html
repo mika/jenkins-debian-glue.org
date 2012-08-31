@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jenkins-debian-glue - Continuous Integration / Delivery for Debian packages</title>
+<link href="/css/bootstrap.css" rel="stylesheet"/>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/">jenkins-debian-glue</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li class="active"><a href="#">Getting Started</a></li>
+          <li><a href="/docs/">Docs</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contribute/">Contribute</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="page-header">
+  <h2>Continuous Integration for Debian packages</h2>
+  </div>
+
+
+<section id="8">
+<div class="page-header">
+<h3>Build Debian packages</h3>
+</div>
+</section>
+
+
+<p>
+Visit the source Job and choose "<i>Build Now</i>". This will start building the Debian source package and if that works as expected it will automatically trigger building the Debian binary package(s). The first run might take some time because you're checking out the source from your VCS for the first time and setting up the cowbuilder environment also takes some time. Once you're past this stage rebuilding should be damn fast, just depending on your network and system speed.
+</p>
+<p>
+To use the local Debian repository just add an entry to your //etc/apt/sources.list.d/foobar.list/, like:
+</p>
+<pre class="example">
+deb file:/srv/repository/ foobar main
+</pre>
+
+
+<p>
+To use the Debian repository from remote systems you can install a web server, symlink the repository to the webserver share via e.g.:
+</p>
+<pre class="example">
+ln -s /srv/repository/ /var/www/debian
+</pre>
+
+
+<p>
+and point //etc/apt/sources.list/foobar.list/ to it:
+</p>
+<pre class="example">
+deb http://$JENKINS_SERVER/debian/ foobar main
+</pre>
+
+
+
+  <a href="https://github.com/mika/jenkins-debian-glue"><img
+      style="position: absolute; top: 40px; right: 0; border: 0;"
+      src="/img/forkme_right_orange_ff7600.png"
+      alt="Fork me on GitHub"></a>
+
+  <hr>
+
+  <footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2012 Michael Prokop | <a href="http://michael-prokop.at/impressum/">Imprint</a></p>
+  </footer>
+
+</div> <!-- /container -->
+
+</body>
+</html>

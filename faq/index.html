@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jenkins-debian-glue - Continuous Integration / Delivery for Debian packages</title>
+<link href="/css/bootstrap.css" rel="stylesheet"/>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/">jenkins-debian-glue</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li><a href="/getting_started/">Getting Started</a></li>
+          <li><a href="/docs/">Docs</a></li>
+          <li class="active"><a href="#">FAQ</a></li>
+          <li><a href="/contribute/">Contribute</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="page-header">
+  <h1>FAQ</h1>
+  </div>
+
+  <h2>Table of Contents</h2>
+
+  <ul>
+    <li><a href="#packaging_replacement">Does jenkins-debian-glue solve the packaging part for me?</a></li>
+    <li><a href="#why_use">Why should I use jenkins-debian-glue instead of manually building packages?</a></li>
+    <li><a href="#vcs">Which version control systems are supported?</a></li>
+    <li><a href="#what_is_cowbuilder">What is cowbuilder and why do I need such a thing?</a></li>
+    <li><a href="#replace_cowbuilder">Does jenkins-debian-glue replace cowbuilder?</a></li>
+    <li><a href="#why_jenkins">Why Jenkins?</a></li>
+    <li><a href="#ubuntu_packages">Can I build Ubuntu packages with jenkins-debian-glue?</a></li>
+    <li><a href="#rpms">Is there support for building RPMs?</a></li>
+    <li><a href="#environment_variables">Why all this messing with environment variables?</a></li>
+    <li><a href="#console_output">Where do I find the console output?</a></li>
+    <li><a href="#console_output_matrix">Where do I find the console output of my *-binaries Job / Matrix build?</a></li>
+    <li><a href="#slave_nodes">How can I build binary packages on some slave nodes and use the repository on a different system?</a></li>
+    <li><a href="#multiple_jenkins_jobs">How can I add multiple Jenkins jobs for the same software package?</a></li>
+    <li><a href="#building_debian_unstable">I've problems building Debian packages against Debian/unstable</a></li>
+    <li><a href="#initial_cowbuilder_fails">Building the initial cowbuilder environment fails</a></li>
+    <li><a href="#single_repository">Can I collect multiple Debian packages in one single repository?</a></li>
+    <li><a href="#foreign_arch_builds">How do I build Debian packages for specific architectures/distributions which require specific features on a build host?</a></li>
+  </ul>
+
+  <hr>
+
+  <section id="packaging_replacement">
+  <div class="page-header">
+  <h2>Does jenkins-debian-glue solve the packaging part for me?</h2>
+  </div>
+  </section>
+
+  <p>No. jenkins-debian-glue is <strong>not</strong> a replacement for providing a
+  <code>debian/</code> directory inside the project you want to build.</p>
+
+
+  <section id="why_use">
+  <div class="page-header">
+  <h2>Why should I use jenkins-debian-glue instead of manually building packages?</h2>
+  </div>
+  </section>
+
+  <p>There are four main approaches how to build a Debian package:</p>
+
+  <ol>
+    <li>build a binary package locally, no chroot/cowbuilder-like environment</li>
+    <li>build a binary package locally, chroot/cowbuilder-like environment</li>
+    <li>build a source package locally, upload result to build environment</li>
+    <li>no local builds at all, changes are committed to a version control system and handled centrally then</li>
+  </ol>
+
+  <p>Approaches #1-3 are broken by design. The results might differ depending on
+  what's available on your local system (uncommitted files laying around), what
+  packages are available on your system (different build-dependencies), how recent
+  your build environment is (forgot to update it), etc.</p>
+
+  <p>Approach #4 is the most sane one (only what's available under version control
+  matters, centrally maintained build environments, policy and Q/A tests,...) and
+  it's the one jenkins-debian-glue is to solve.</p>
+
+  <p>Last but not least - why should you build stuff manually at all? Computers
+  are there to do that for you, so why not just commit your changes to the version
+  control system and let them figure out the rest for you?</p>
+
+  <section id="vcs">
+  <div class="page-header">
+  <h2>Which version control systems are supported?</h2>
+  </div>
+  </section>
+
+  <p>Currently <a href="http://git-scm.com/">Git</a> and <a
+  href="http://subversion.apache.org/">Subversion</a> are supported. The author of
+  jenkins-debian-glue is aware of people working on <a
+  href="http://bazaar.canonical.com/">Bazaar</a> support. Support for further
+  version control systems is welcome, check out the <a
+  href="https://github.com/mika/jenkins-debian-glue/tree/master/scripts">the
+  existing generate-*-snapshot scripts</a> if you're interested in how they
+  work.</p>
+
+  <p><span class="label label-info">Background story:</span> Git is the version
+  control system we're using for the <a href="http://grml.org/">Grml project</a>
+  where we heavily rely on Jenkins in our development and release pipeline.
+  Development on subversion support was sponsored by <a
+  href="http://www.sipwise.com/">Sipwise</a>. By supporting Git and Subversion we
+  are targeting for more than 9000 packages available in Debian. representing more
+  than 90% of the VCS managed packages. See '<a
+  href="http://michael-prokop.at/blog/2011/08/19/use-of-vcs-in-debian-packages-some-stats/">Use
+  of VCS in Debian packages</a>' for more information regarding those stats.</p>
+
+
+  <section id="what_is_cowbuilder">
+  <div class="page-header">
+  <h2>What is cowbuilder and why do I need such a thing?</h2>
+  </div>
+  </section>
+
+  <p>cowbuilder is a wrapper for pbuilder, which itself is a tool for building
+  Debian packages inside a clean chroot. Building Debian packages inside clean and
+  reproducable environments is an important step in the philosophy of Debian
+  packaging as well as Continuous Integration and Continuous Delivery.</p>
+
+  <p>No worries though, jenkins-debian-glue abstracts all the cowbuilder magic
+  away for you.</p>
+
+
+  <section id="replace_cowbuilder">
+  <div class="page-header">
+  <h2>Does jenkins-debian-glue replace cowbuilder?</h2>
+  </div>
+  </section>
+
+  <p>No. jenkins-debian-glue works on top of cowbuilder (which itself uses
+  pbuilder/cowdancer). It neither replaces cowbuilder nor tries to do so.
+  jenkins-debian-glue provides the layer between your version controlled Debian
+  packages, building them with cowbuilder and integrating that in Jenkins.</p>
+
+
+  <section id="why_jenkins">
+  <div class="page-header">
+  <h2>Why Jenkins?</h2>
+  </div>
+  </section>
+
+  <p><a href="http://jenkins-ci.org/">Jenkins</a> is one of the leading continuous
+  integration servers, being available under an open source license and a vibrant
+  community around it. It provides an easy to use web interface as well as
+  enterprise™-ready integration. This provides a perfect continous integration
+  system for jenkins-debian-glue to address individual developers as well as big
+  developer teams.</p>
+
+
+  <section id="ubuntu_packages">
+  <div class="page-header">
+  <h2>Can I build Ubuntu packages with jenkins-debian-glue?</h2>
+  </div>
+  </section>
+
+  <p>Yes. It's about building <code>.deb</code> files, not about being restricted
+  to the Debian system. You can build packages for Debian on your Ubuntu system
+  and also build packages for Ubuntu on your Debian system. Actually every
+  distribution should work where cowbuilder &amp; related tools are available.</p>
+
+
+  <section id="rpms">
+  <div class="page-header">
+  <h2>Is there support for building RPMs?</h2>
+  </div>
+  </section>
+
+  <p>No. jenkins-debian-glue is limited to Debian packages currently.
+  If you want to get something like jenkins-debian-glue for RPMs please
+  <a href="/contact/">talk to the author</a>.</p>
+
+
+  <section id="environment_variables">
+  <div class="page-header">
+  <h2>Why all this messing with environment variables?</h2>
+  </div>
+  </section>
+
+  <p>jenkins-debian-glue makes use of environment variables wherever feasible.
+  Environment variables are an important concept within Jenkins jobs, especially
+  when dealing with Matrix Jobs and Copy artifacts (where you can copy stuff e.g.
+  with <code>foobar-source/distribution=$distribution</code>) as well as when
+  you're considering usage of plugins like <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/EnvInject+Plugin">EnvInject</a>.</p>
+
+
+  <section id="console_output">
+  <div class="page-header">
+  <h2>Where do I find the console output?</h2>
+  </div>
+  </section>
+
+  <p>The easiest way to access the console output is choosing the "Last build"
+  URL under the "Permalinks" section at the bottom of you Jenkins job, which
+  usually corresponds to http://$JENKINS_SERVER/job/$JOBNAME/lastBuild/console.
+  This URL contains the "lastBuild" keyword instead of hardcoding a specific build
+  number so you just need to choose reload in your browser to get the most current
+  version.</p>
+
+  <p>To locate this URL from the Jenkins web interface choose 'Last build':</p>
+
+  <p><img src="/img/permalinks.png"  alt="Screenshot of permalinks in Jenkins" /></p>
+
+  <p>On the left side on the bottom you'll find a link named "Console Output" then, choose this one:</p>
+
+  <p><img src="/img/console_output_url.png"  alt="Screenshot of console output in Jenkins" /></p>
+
+  <section id="console_output_matrix">
+  <div class="page-header">
+  <h2>Where do I find the console output of my *-binaries Job / Matrix build?</h2>
+  </div>
+  </section>
+
+  <p>Locating the console output of Matrix builds sadly is not obvious. You have
+  to visit the according Matrix axe configurations which are listed under the
+  "Configurations" section of your Jenkins job. If you have just one axis inside
+  your Jenkins job configuration it wil be named "default":</p>
+
+  <p><img src="/img/configuration_default.png"  alt="Axis configuration in Jenkins" /></p>
+
+  <p>Or if you have multiple axes assigned then you'll find them listed below
+  "Configurations" as well, like:</p>
+
+  <p><img src="/img/configuration_multiarch.png"  alt="Screenshot of multiarch configuration" /></p>
+
+  <p>Inside the Matrix configurations you'll find the usual "Permalinks" as
+  documented in the previous section of this FAQ.</p>
+
+
+  <section id="slave_nodes">
+  <div class="page-header">
+  <h2>How can I build binary packages on some slave nodes and use the repository on a different system?</h2>
+  </div>
+  </section>
+
+  <p>Once you start up scaling with Debian package builds with several nodes you
+  don't want to include the Debian package(s) on the same node as you're building
+  (for obvious reasons).</p>
+
+  <p>The build-and-provide-package script does support such distributed builds by
+  using the BUILD<sub>ONLY</sub> and PROVIDE<sub>ONLY</sub> variables. Usage
+  example for the *-binaries job:</p>
+
+
+<pre class="example">export BUILD_ONLY=true
+export SUDO_CMD=sudo
+/usr/bin/build-and-provide-package
+</pre>
+
+  <p>Create a *-repos job which gets triggered from the *-binaries job. Don't
+  forget to use "Copy artifacts from another project" (copying the files from the
+  *-binaries job) there. Assign the *-repos job to the node which provides the
+  Debian repository so it gets executed only on the system it should be executed
+  on.</p>
+
+  <p>Inside the *-repos job you can use something like:</p>
+
+<pre class="example">
+mkdir -p binaries
+
+for suffix in gz bz2 xz deb dsc changes ; do
+  mv */*.${suffix} binaries/ || true
+done
+
+# if building a tagged version then do not include that one in the release-trunk repository
+case "$branch" in tags/*|branches/*) export IGNORE_RELEASE_TRUNK=true;; esac
+
+export SUDO_CMD=sudo
+export BASE_PATH="binaries/"
+export PROVIDE_ONLY=true
+/usr/bin/build-and-provide-package
+</pre>
+
+
+
+  <section id="multiple_jenkins_jobs">
+  <div class="page-header">
+  <h2>How can I add multiple Jenkins jobs for the same software package?</h2>
+  </div>
+  </section>
+
+
+  <p>If you need further Jenkins jobs for the same package you can achieve that by
+  setting the <i>REPOS</i> environment variable. Let's assume you already have the
+  Jenkins jobs <i>foobar-source</i> and <i>foobar-binaries</i> for a software
+  package called <i>foobar</i>. To use <i>foobar</i> with different settings as
+  project <i>foobar-testing</i> all you've to do is setting the <i>REPOS</i>
+  environment variable inside the build steps of the Jenkins job. Usage example
+  for <i>foobar-testing-binaries</i>:</p>
+
+<pre class="example">export REPOS="${JOB_NAME%-testing-binaries*}"
+sudo /usr/bin/generate-reprepro-codename "${REPOS}"
+....
+</pre>
+
+
+  <section id="building_debian_unstable">
+  <div class="page-header">
+  <h2>I've problems building Debian packages against Debian/unstable</h2>
+  </div>
+  </section>
+
+  <p>Make sure you're using recent versions of cowbuilder and its underlying
+  pbuilder. Some features like '[linux-any]' in Build-Depends might not be
+  available in the cowbuilder/pbuilder version used in Debian/squeeze yet, so make
+  sure you install cowbuilder/pbuilder from Debian/testing and/or Debian/unstable.</p>
+
+
+  <section id="initial_cowbuilder_fails">
+  <div class="page-header">
+  <h2>Building the initial cowbuilder environment fails</h2>
+  </div>
+  </section>
+
+  <p>If you notice 'pbuilder create failed' in the build log then you might be
+  building a Debian unstable cowbuilder environment at a time where some
+  dependencies cause bootstrap errors. To avoid this manually install the
+  cowbuilder base.cow using the command line present in your build log but replace
+  <i>sid</i> with <i>squeeze</i> and manually upgrade the cowbuilder environment
+  to Debian unstable/sid then.</p>
+
+
+  <section id="single_repository">
+  <div class="page-header">
+  <h2>Can I collect multiple Debian packages in one single repository?</h2>
+  </div>
+  </section>
+
+  <p>Yes. This feature is provided through so called release builds. In release
+  builds you add a release repository name through the "<i>$release</i>" variable
+  to the source job which is then handed over to the binaries job. The binaries
+  job then takes care of installing the Debian packages to the repository as
+  specified by the "<i>$release</i>" variable instead of installing them into
+  their own repository. This feature is especially handy if you trigger several
+  Jenkins jobs from a central place (like your own dashboard) to get a full
+  release build.</p>
+
+  <p>First of all make sure you have the <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/Parameterized+Trigger+Plugin">Parameterized
+  Trigger plugin</a> installed. Then add "This build is parameterized" in the
+  source job with String parameters as follows:</p>
+
+<pre class="example">
+Name: release
+Default value: none
+release version if the results should be part of a release (otherwise leave it at 'none')
+</pre>
+
+  <p>Enable "<i>Trigger parameterized build on other projects</i>" with settings
+  as follows (replace $JOBNAME-binaries accordingly):</p>
+
+<pre class="example">
+Projects to build: $JOBNAME-binaries
+Trigger when build is: Stable or unstable but not failed
+Trigger build without parameters [ ]
+</pre>
+
+  <p>and set "<i>Predefined parameters</i>" to:</p>
+
+<pre class="example">
+release=${release}
+</pre>
+
+  <p>That's it. Now you can replace the "none" with your specific release build
+  name when triggering a new source job.</p>
+
+
+  <section id="foreign_arch_builds">
+  <div class="page-header">
+  <h2>How do I build Debian packages for specific architectures/distributions which require specific features on a build host?</h2>
+  </div>
+  </section>
+
+  <p>While building amd64 and i386 can be done on one single 64bit build system
+  you can't build e.g. packages for the sparc architecture on the same host any
+  longer. To get such a setup up and running you need to extend the Matrix job
+  configuration of your binaries Jenkins job to include all the architectures that
+  should be supported. Then make sure your Jenkins slave nodes have according
+  label names, like "amd64", "i386" and "sparc" so you can assign specific builds
+  to specific slaves.</p>
+
+  <p>Then enable the "<i>Combination Filter</i>" to execute the according
+  architecture builds only on the according hosts, like:</p>
+
+<pre class="example">
+(label=="sparc").implies(architecture=="sparc") &amp;&amp; (label=="amd64").implies(architecture=="amd64") &amp;&amp; (label=="i386").implies(architecture=="i386")
+</pre>
+
+  <p>Screenshot of such a configuration:</p>
+
+  <p><img src="/img/multiarch_matrix_build.png"  alt="Screenshot of advanced multiarch configuration in Jenkins" /></p>
+
+  <p>This should give you a Matrix job execution like:</p>
+
+  <p><img src="/img/multiarch_matrix_build_result.png"  alt="Screenshot of matrix build result" /></p>
+
+  <hr>
+
+  <a href="https://github.com/mika/jenkins-debian-glue"><img style="position: absolute; top: 40px; right: 0; border: 0;"
+    src="/img/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+
+  <footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2012 Michael Prokop | <a href="http://michael-prokop.at/impressum/">Imprint</a></p>
+  </footer>
+
+</div> <!-- /container -->
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jenkins-debian-glue - Continuous Integration / Delivery for Debian packages</title>
+<link href="/css/bootstrap.css" rel="stylesheet"/>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/">jenkins-debian-glue</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li class="active"><a href="/getting_started/">Getting Started</a></li>
+          <li><a href="/docs/">Docs</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contribute/">Contribute</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="page-header">
+  <h1>Automatic Deployment of jenkins-debian-glue</h1>
+  </div>
+
+  <p>The automatic deployment method will provide you a full featured Continuous
+  Integration system with Jenkins and jenkins-debian-glue within just a few
+  minutes, assuming that you have neither of them installed nor configured.</p>
+
+  <p>The deployment script expects</p>
+
+  <ul>
+    <li>a <strong>Debian</strong> system (<a href="http://www.debian.org/distrib/netinst">amd64</a> recommended), or</li>
+    <li>a <strong>Ubuntu</strong> system (<a href="http://www.ubuntu.com/download/server">Ubuntu Server 12.04
+        LTS 64bit</a> recommended)</li>
+  </ul>
+
+  <p>with &gt;=512MB RAM and &gt;=2GB of free disk space.</p>
+
+  <div class="alert">
+    <button type="button" class="close" data-dismiss="alert" href="#">×</button>
+    <strong>The Ubuntu Server 12.04 LTS on Amazon EC2
+    is known to work fine out of the box.</strong>
+    <a href="https://aws.amazon.com/marketplace/pp/B007Z5YWX4">
+        <img src="/img/ubuntu_ec2.png" />
+    </a>
+  </div>
+
+  <p>All you need to do to automatically deploy the stack is <strong>execute the following two commands</strong>:</p>
+
+<pre>
+wget --no-check-certificate https://raw.github.com/mika/jenkins-debian-glue/master/puppet/apply.sh
+sudo bash ./apply.sh your_password
+</pre>
+
+  <p>This will take ~5 minutes (depending on network and disk speed).</p>
+
+  <p>After installation finished successfully you'll notice:</p>
+
+<pre>
+Now point your browser to http://$SERVER_IP:8080
+</pre>
+
+  <p>Visiting your browser should give you the following screen:</p>
+
+  <ul class="thumbnails">
+  <li class="span3">
+    <a href="/img/jenkins_fresh.png" class="thumbnail">
+      <img src="/img/jenkins_fresh.png" alt="">
+    </a>
+  </li>
+  </ul>
+
+  <p>Now login with username <code>jenkins-debian-glue</code> and the password
+  you set in the <code>apply.sh</code> commandline ('your_password' in the example
+  above).</p>
+
+  <div class="alert">
+    <button type="button" class="close" data-dismiss="alert" href="#">×</button>
+    <strong>Do not forget to change your password! Visit</strong>
+    <code>http://$SERVER_IP:8080/user/jenkins-debian-glue/configure</code> <strong>to
+    change it.</strong>
+  </div>
+
+  <p>Return to the start page again and go to the <i>jenkins-debian-glue-source</i>
+  Jenkins job and select <i>Build now</i>. A few seconds later the job should be
+  finished and automatically triggers the <i>jenkins-debian-glue-binaries</i>
+  Jenkins job. This will take a while for its first run (setting up the
+  cowbuilder environment for you).</p>
+
+  <p>Once the <i>jenkins-debian-glue-binaries</i> Jenkins job has finished as
+  well you should have two Jenkins jobs marked as blue (AKA success):</p>
+
+  <ul class="thumbnails">
+  <li class="span3">
+    <a href="/img/jenkins_jobs.png" class="thumbnail">
+      <img src="/img/jenkins_jobs.png" alt="">
+    </a>
+  </li>
+  </ul>
+
+  <p><span class="label notice">Problems?</span> Check out the
+  build console log which should be available at
+  <code>http://$SERVER_IP:8080/job/jenkins-debian-glue-binaries/architecture=amd64/lastBuild/console</code>
+  </p>
+
+  <div class="alert alert-success"><strong>Well done - that's it! You have your own
+  Debian packages of jenkins-debian-glue now.</strong></div>
+
+  <p>Execute <code>sudo repository_checker --list-repos jenkins-debian-glue</code> to get a listing of Debian packages inside the
+  jenkins-debian-glue repository, which is available in <code>/srv/repository</code>. Now you have everything to add your own
+  Debian packages and enjoy the benefits of Continuous Integration.</p>
+
+  <p><a class="pull-right btn btn-primary btn-large" href="/docs/">Next Steps - Customization</a></p>
+
+  <br />
+  <br />
+
+  <hr>
+
+  <footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2012 Michael Prokop | <a href="http://michael-prokop.at/impressum/">Imprint</a></p>
+  </footer>
+
+</div> <!-- /container -->
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap-alert.js"></script>
+
+</body>
+</html>

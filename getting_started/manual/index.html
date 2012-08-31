@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jenkins-debian-glue - Continuous Integration / Delivery for Debian packages</title>
+<link href="/css/bootstrap.css" rel="stylesheet"/>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/">jenkins-debian-glue</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li class="active"><a href="/getting_started/">Getting Started</a></li>
+          <li><a href="/docs/">Docs</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contribute/">Contribute</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="page-header">
+  <h1>Manual Deployment of jenkins-debian-glue</h1>
+  </div>
+
+  <h2>Table of Contents</h2>
+
+  <ul>
+    <li><a href="#system_requirements">System requirements</a></li>
+    <li><a href="#preamble">Preamble</a></li>
+    <li><a href="#jenkins_plugins">Install Jenkins Plugins</a></li>
+    <li><a href="#vcs_tools">Install and configure VCS tools</a></li>
+    <li><a href="#source_job">Create the source job configuration (jenkins-debian-glue-source)</a></li>
+    <li><a href="#binaries_job">Create the binaries job configuration (jenkins-debian-glue-binaries)</a></li>
+    <li><a href="#sudo">Configure sudo</a></li>
+    <li><a href="#building">Building the Jenkins jobs</a></li>
+  </ul>
+
+  <hr>
+
+  <section id="system_requirements">
+  <div class="page-header">
+  <h2>System requirements</h2>
+  </div>
+  </section>
+
+  <ul>
+
+    <li><a href="http://www.debian.org/">Debian</a> or <a
+    href="http://www.ubuntu.com/">Ubuntu</a> (amd64/64bit
+    recommended)</li>
+
+    <li><a href="http://jenkins-ci.org/">Jenkins</a> (install <a
+    href="http://pkg.jenkins-ci.org/debian-stable/">Jenkins Debian
+    packages from upstream</a>)</li>
+
+    <li><a
+    href="http://packages.debian.org/sid/cowbuilder">cowbuilder</a>, <a
+    href="http://packages.debian.org/sid/reprepro">reprepro</a> and <a
+    href="http://packages.debian.org/sid/sudo">sudo</a> (all available via
+    apt-get/aptitude)</li>
+
+  </ul>
+
+  <section id="preamble">
+  <div class="page-header">
+  <h2>Preamble</h2>
+  </div>
+  </section>
+
+  <p>jenkins-debian-glue assumes two (or optionally more) Jenkins jobs for
+  each software package.  One job builds the Debian source package, this
+  is the source job. Assuming the software package is named <i>foobar</i>
+  then its source job is assumed to be <i>foobar-source</i>. The other job
+  builds the Debian binary package(s), this is the binaries job.  Once
+  again assuming we're talking about the <i>foobar</i> software package
+  then the binaries job is assumed to be <i>foobar-binaries</i>. As we're
+  starting with jenkins-debian-glue itself we'll use
+  jenkins-debian-glue-source and jenkins-debian-glue-binaries in the
+  following documentation.</p>
+
+  <p>Setting up those jobs is really simple. Just follow the following
+  steps and you should have a working system in less than 20 minutes.</p>
+
+  <section id="jenkins_plugins">
+  <div class="page-header">
+  <h2>Install Jenkins Plugins</h2>
+  </div>
+  </section>
+
+  <h3>Install "Copy Artifact Plugin"</h3>
+
+  <p>The <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/Copy+Artifact+Plugin">Copy
+  Artifact Plugin</a> (install it via
+  <code>http://$JENKINS_SERVER/pluginManager/available</code> or through the <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+CLI">jenkins-cli.jar</a>'s
+  install-plugin option on the command line) provides the option to deploy
+  artifacts from the source job to the binaries job. Make sure it's installed so
+  you get the "<i>Copy artifacts from another project</i>" option as Build step,
+  used in the following steps.</p>
+
+  <h3>Install "Jenkins Workspace Cleanup Plugin"</h3>
+
+  <p>The <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/Workspace+Cleanup+Plugin">Jenkins
+  Workspace Cleanup Plugin</a> provides the "Delete workspace before build
+  starts" option which is useful for getting rid of files from previous
+  runs.</p>
+
+  <h3>Install "xUnit Plugin"</h3>
+
+  <p>The <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/xUnit+Plugin">xUnit
+  Plugin</a> provides support for collecting and publishing test reports which
+  are provided in the xUnit format. The lintian integration of
+  jenkins-debian-glue provides support for it.</p>
+
+
+  <section id="vcs_tools">
+  <div class="page-header">
+  <h2>Install and configure VCS tools</h2>
+  </div>
+  </section>
+
+  <div class="page-header">
+  <h3>Setup for Debian packages managed in Git</h3>
+  </div>
+
+  <p>Make sure the Git Plugin is installed in Jenkins. On the build system you
+  need git-buildpackage and a basic Git configuration for the user under which
+  Jenkins is running (usually being 'jenkins'): </p>
+
+<pre>
+# apt-get install git-buildpackage
+</pre>
+
+
+  <p>Then either adjust the "Git plugin" settings at <code>http://$JENKINS_SERVER/configure</code> or manually execute:</p>
+
+<pre>
+# su - jenkins
+% git config --global user.email "jenkins@example.org"
+% git config --global user.name "Jenkins User"
+</pre>
+
+  <div class="page-header">
+  <h3>Setup for Debian packages managed in Subversion</h3>
+  </div>
+
+  <p>The "Subversion Plugin" is shipped by Jenkins out of the box nowadays, but to use it with Debian packages please make sure you've subversion-tools available on the build system:</p>
+
+<pre>
+# apt-get install subversion-tools
+</pre>
+
+  <section id="source_job">
+  <div class="page-header">
+  <h2>Create the source job configuration (jenkins-debian-glue-source)</h2>
+  </div>
+  </section>
+
+  <p>Create a new job using the '<i>Build a free-style software project</i>'
+  option in Jenkins. Use <code>jenkins-debian-glue-source</code> for the job
+  name. Then enable and configure 'URL of repository' of the according version
+  control system under 'Source Code Management' to automatically check out
+  sources.</p>
+
+  <p><span class="label label-info">Important:</span> set the "<i>Local
+  subdirectory for repo (optional)</i>" option under <i>Advanced</i> settings to
+  "<i>source</i>". (For jobs using Subversion set "<i>Local module directory
+  (optional)</i>" to "<i>source</i>").</p>
+
+  <p>In the "<i>Build</i>" section add a build step "<i>Execute shell</i>" as
+  follows to get rid of files from previous runs without removing the VCS
+  checkout:</p>
+
+<pre>
+rm -f ./* || true
+</pre>
+
+  <p><span class="label notice">Notice:</span> the "Delete workspace before
+  build starts" option provided by the <a
+  href="https://wiki.jenkins-ci.org/display/JENKINS/Workspace+Cleanup+Plugin">Jenkins
+  Workspace Cleanup Plugin</a> works as well, though it also removes the
+  repository checkout so build time might increase. Identify what you want and
+  choose on your own.</p>
+
+  <p>Then add another build step of "<i>Execute shell</i>" as follows:</p>
+
+
+<pre># when using git:
+/usr/bin/generate-git-snapshot
+
+# when using subversion:
+# /usr/bin/generate-svn-snapshot
+</pre>
+
+
+  <p>Under "<i>Post-build Actions</i>" select "<i>Archive the artifacts</i>"
+  using: </p>
+
+<pre>
+*.gz,*.bz2,*.xz,*.deb,*.dsc,*.changes
+</pre>
+
+  <p>
+  <img src="/img/archive_artifacts.png" alt="Screenshot of Archive the artifacts" />
+  </p>
+
+  <p>Enable "<i>Record fingerprints of files to track usage</i>" and its
+  "<i>Fingerprint all archived artifacts</i>" setting:</p>
+
+  <p>
+  <img src="/img/record_fingerprints.png" alt="Screenshoft of Fingerprint all archived artifacts" />
+  </p>
+
+  <section id="binaries_job">
+  <div class="page-header">
+  <h2>Create the binaries job configuration (jenkins-debian-glue-binaries)</h2>
+  </div>
+  </section>
+
+
+  <p>Add a new "<i>Build multi-configuration project</i>" Jenkins job
+  named <code>jenkins-debian-glue-binaries</code>.</p>
+
+  <p>Enable "<i>Build after other projects are built</i>" under <i>Build
+  Triggers</i> and choose the name of the source job, being
+  <i>jenkins-debian-glue-source</i> in this example:</p>
+
+  <p>
+  <img src="/img/build_after_other_projects.png" alt="Screenshot of Build After Other Projects Configuration" />
+  </p>
+
+  <p>Under <i>Configuration Matrix</i> create a user-defined Axis titled
+  "<i>architecture</i>" specifying the architectures your Debian packages
+  should be built for.  If you're running an amd64 system (recommended
+  nowadays) then <i>amd64</i> should be your default choice no matter
+  what. If you also want to build Debian packages for i386 then add
+  <i>i386</i> (separated by whitespace from 'amd64'):</p>
+
+  <p>
+  <img src="/img/user_defined_axis.png" alt="Screenshot for user defined axis" />
+  </p>
+
+  <p>Choose "<i>Run each configuration sequentially</i>" and in the
+  <i>Build Environment</i> section enable the "Delete workspace before
+  build starts" option (provided by the Workspace Cleanup Plugin):</p>
+
+  <p>
+  <img src="/img/delete_workspace.png" alt="Configuration for Build Environment" />
+  </p>
+
+  <p><span class="label notice">Notice:</span> once you're building for multiple
+  architectures or distributions you might also want to enable the option
+  '<i>Execute touchstone builds first</i>'.</p>
+
+  <p>In the "<i>Build</i>" section configure the build step "<i>Copy artifacts
+  from another project</i>" as follows:</p>
+
+<!--
+<pre>
+Project name: jenkins-debian-glue-source
+Which build: "/Upstream build that triggered this job/"
+[x] "Last successful build"
+Artifacts to copy: *
+Target directory:
+</pre>
+-->
+
+  <p>
+  <img src="/img/copy_artifacts.png"  alt="Screenshot of Copy Artifcats configuration" />
+  </p>
+
+  <p>
+  In the "<i>Build</i>" section add a build step "<i>Execute shell</i>" using:
+  </p>
+
+<pre>
+/usr/bin/build-and-provide-package
+</pre>
+
+  <p>Under "<i>Post-build Actions</i>" select "<i>Archive the artifacts</i>"
+  using:</p>
+
+<pre>
+*.gz,*.bz2,*.xz,*.deb,*.dsc,*.changes
+</pre>
+
+
+  <section id="sudo">
+  <div class="page-header">
+  <h2>Configure sudo</h2>
+  </div>
+  </section>
+
+  <p>To be able to execute cowbuilder as user <i>jenkins</i> install a file into
+  /etc/sudoers.d/jenkins (file permissions 440 recommended) containing:</p>
+
+<pre>
+jenkins ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot
+</pre>
+
+  <p>Create <code>/srv/repository/</code> and provide write permissions to
+  jenkins user:</p>
+
+<pre>
+# mkdir /srv/repository
+# chown jenkins /srv/repository
+</pre>
+
+
+  <section id="lintian">
+  <div class="page-header">
+  <h3>Enable Lintian reports</h3>
+  </div>
+  </section>
+
+  <p><a href="http://lintian.debian.org/">Lintian</a> dissects Debian packages
+  and tries to find bugs and policy violations. It contains automated checks for
+  many aspects of Debian policy as well as some checks for common errors which
+  turns out to be very useful for inclusion in Continuous Integration/Delivery
+  infrastructures.</p>
+
+  <p>To enable Lintian reports for your jenkins-debian-glue jobs add the
+  following "<i>Execute shell</i>" build step at the end of the build steps in
+  your *-source and *-binaries Jenkins jobs:</p>
+
+<pre>
+mkdir -p report
+/usr/bin/lintian-junit-report *.dsc &gt; report/lintian.xml
+</pre>
+
+  <p>and add <code>lintian.txt</code> (no it's not a typo) to the list of
+  artifacts to archive.</p>
+
+  <p>Enable the '<i>Publish JUnit test result report</i>' Post-build action and
+  select <code>**/lintian.xml</code> for the files to report.Then you should get
+  test reports for your Debian packages based on lintian's output.</p>
+
+
+  <section id="building">
+  <div class="page-header">
+  <h2>Building the Jenkins jobs</h2>
+  </div>
+  </section>
+
+  <p>Return to the Jenkins startpage, klick on the
+  <i>jenkins-debian-glue-source</i> Jenkins job and select <i>Build now</i>. A
+  few seconds later the job should be finished and automatically triggers the
+  <i>jenkins-debian-glue-binaries</i> Jenkins job. This will take a while for
+  its first run (setting up the cowbuilder environment for you).</p>
+
+  <p>Once the <i>jenkins-debian-glue-binaries</i> Jenkins job has finished as
+  well you should have two Jenkins jobs marked as blue (AKA success):</p>
+
+  <ul class="thumbnails">
+  <li class="span3">
+    <a href="/img/jenkins_jobs.png" class="thumbnail">
+      <img src="/img/jenkins_jobs.png" alt="">
+    </a>
+  </li>
+  </ul>
+
+  <p><span class="label notice">Problems?</span> Check out the
+  build console log which should be available at
+  <code>http://$SERVER_IP:8080/job/jenkins-debian-glue-binaries/architecture=amd64/lastBuild/console</code>
+  </p>
+
+  <div class="alert alert-success"><strong>Well done - that's it! You have your own
+  Debian packages of jenkins-debian-glue now.</strong></div>
+
+  <p>Execute <code>sudo repository_checker --list-repos jenkins-debian-glue</code> to get a listing of Debian packages inside the
+  jenkins-debian-glue repository, which is available in <code>/srv/repository</code>. Now you have everything to add your own
+  Debian packages and enjoy the benefits of Continuous Integration.</p>
+
+  <p><a class="pull-right btn btn-primary btn-large" href="/docs/">Next Steps - Customization</a></p>
+
+  <br />
+  <br />
+
+  <a href="https://github.com/mika/jenkins-debian-glue"><img
+      style="position: absolute; top: 40px; right: 0; border: 0;"
+      src="/img/forkme_right_orange_ff7600.png"
+      alt="Fork me on GitHub"></a>
+
+  <hr>
+
+  <footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2012 Michael Prokop | <a href="http://michael-prokop.at/impressum/">Imprint</a></p>
+  </footer>
+
+</div> <!-- /container -->
+
+</body>
+</html>

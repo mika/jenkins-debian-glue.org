@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>jenkins-debian-glue - Continuous Integration / Delivery for Debian packages</title>
+<link href="/css/bootstrap.css" rel="stylesheet"/>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/">jenkins-debian-glue</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li><a href="/getting_started/">Getting Started</a></li>
+          <li class="active"><a href="#">Docs</a></li>
+          <li><a href="/faq/">FAQ</a></li>
+          <li><a href="/contribute/">Contribute</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="page-header">
+  <h1>Documentation</h1>
+  </div>
+
+  <div class="page-header">
+  <h2>Table of Contents</h2>
+  </div>
+
+  <ul>
+    <li><a href="#trigger">Trigger Jenkins builds when pushing changes to the repository</a></li>
+    <li><a href="#changing_branches">Build packages using different branches</a></li>
+    <li><a href="#scripts">Purpose of the scripts</a></li>
+    <li><a href="#customization">Customization and Configuration</a></li>
+    <li><a href="#tips_and_tricks">Tips and Tricks</a></li>
+  </ul>
+
+  <hr>
+
+  <div class="alert">
+    <button type="button" class="close" data-dismiss="alert" href="#">×</button>
+    <strong>New to jenkins-debian-glue? Please check out <a href="/getting_started/">Getting Started</a> before digging deeper into the docs.</strong>
+  </div>
+
+  <section id="new_job">
+  <div class="page-header">
+  <h2>Create a new Jenkins job for your own Debian package</h2>
+  </div>
+  </section>
+
+  <p>The easiest way to add further Jenkins jobs for additional Debian packages
+  is using the existing ones as input. Just use the exisiting
+  <code>jenkins-debian-glue-source</code> job as input for your new *-source job
+  and the <code>jenkins-debian-glue-binaries</code> one as input for your new
+  *-binaries job:</p>
+
+  <p>
+  <img src="/img/new_job.png" alt="Screenshot of New Jenkins job dialog" />
+  </p>
+
+  <p>Do not forget to adjust the repository URL accordingly for your own
+  package:</p>
+
+  <p>
+  <img src="/img/scm_settings.png" alt="Screenshot of adjustting SCM settings" />
+  </p>
+
+  <div class="alert">
+    <button type="button" class="close" data-dismiss="alert" href="#">×</button>
+    <strong>Do not forget to adjust all references to jenkins-debian-glue-* in
+    your new Jenkins jobs with your new jenkins jobs!</strong>
+  </div>
+
+
+  <section id="trigger">
+  <div class="page-header">
+  <h2>Trigger Jenkins builds when pushing changes to the repository</h2>
+  </div>
+  </section>
+
+  <p>Once you're happy with the way your Jenkins jobs work you usually don't
+  want to click on '<i>Build now</i>' manually whenever you want to trigger the
+  build process. Instead let's build Debian packages whenever changes are pushed
+  into your repository.</p>
+
+  <p>To avoid polling for updates in VCS trigger the build remotely from your
+  version control system:</p>
+
+  <ul>
+
+    <li>If you're using Github for your Git repository the easiest way to get
+    remote trigger actions working is using the <a
+    href="https://wiki.jenkins-ci.org/display/JENKINS/Github+Plugin">Github
+    Plugin</a> with its "<i>Build when a change is pushed to GitHub</i>"
+    option.</li>
+
+    <li>If you don't use Github but have your own git repository hosting then
+    enable "<i>Trigger builds remotely (e.g., from scripts)</i>" option in the
+    Build Triggers section. Set a user-defined authentication token so only you
+    and your installed hook scripts know how to trigger such a build. The <a
+    href="https://github.com/mika/jenkins-debian-glue/tree/master/svn">svn</a>
+    and <a
+    href="https://github.com/mika/jenkins-debian-glue/tree/master/git">git</a>
+    directories of the jenkins-debian-glue source provide examples for VCS hooks
+    to trigger remote builds on each commit. (While this approach requires a bit
+    more effort to set up you're much more flexible as you can customize your
+    hooks as you like. For example building only specific branches, providing
+    parameterized build settings and triggering multiple (independent) Jenkins jobs
+    </li>
+
+  </ul>
+
+  <section id="changing_branches">
+  <div class="page-header">
+  <h2>Build packages using different branches</h2>
+  </div>
+  </section>
+
+  <p>You might want to build your Debian package based on a specific branch. For
+  Git you could hardcode the branch(es) inside the 'Branches to build' setting.
+  But you are much more flexible by using parameterized builds. Depending on
+  whether you use Git or Subversion adjust the Jenkins job accordingly:</p>
+
+  <p>If you're using <strong>Git</strong> the enable the '<i>This build is
+  parameterized</i>' with the '<i>String parameter</i>' option in the source
+  job. Add String Parameter settings as follows:</p>
+
+<pre class="example">
+Name: branch
+Default value: master
+Description: branch to build (trunk, tags/...)
+</pre>
+
+  <p>Then adjust the 'Branches to build' SCM settings:</p>
+
+  <p>
+  <img src="/img/git_branches.png" alt="Screenshot of git branch settings" />
+  </p>
+
+  <p>If you're using <strong>Subversion</strong> instead then enable the
+  '<i>This build is parameterized</i>' with the '<i>List Subversion tags (and
+      more)</i>' option in the source job. An example configuration looks
+  like:</p>
+
+  <p>
+  <img src="/img/svn_branches.png" alt="Screenshot of subversion branch settings" />
+  </p>
+
+  <p>DONE! Now you should be able to choose the branch that should be used for
+  building the Debian source package.</p>
+
+
+  <section id="scripts">
+  <div class="page-header">
+  <h2>Purpose of the scripts</h2>
+  </div>
+  </section>
+
+  <p>The following <a
+  href="https://github.com/mika/jenkins-debian-glue/tree/master/scripts">scripts</a>
+  are provided by jenkins-debian-glue:</p>
+
+  <ul>
+
+    <li><code>build-and-provide-package</code>: uses the Debian package source
+    files (provided and derived from the according *-source Jenkins job) for
+    building Debian binary package(s) for the specified $architecture of the
+    matrix build using cowbuilder. The resulting binary package(s) will be
+    installed in the repository (managed through reprepro) to provide it for usage
+    via APT.</li>
+
+    <li><code>generate-git-snapshot</code>: generates a snapshot version of the
+    Debian package using git-dch to generate <code>debian/changelog</code>
+    containing a list of changes</li>
+
+    <li><code>generate-reprepro-codename</code>: takes a repository/codename as
+    command line option and adds an according repository/codename definition to
+    <code>/srv/repository/conf/distributions</code> (iff the codename is not
+    present yet).</li>
+
+    <li><code>generate-svn-snapshot</code>: generates a snapshot version of a
+    Debian package using svn log, svn2cl and some dirty shell magic to get a useful
+    <code>debian/changelog</code>.</li>
+
+    <li><code>increase-version-number</code>: takes a version number as command
+    line argument and raises the version number for usage inside as a new snapshot
+    version. Nowadays the script just adds '+0' to the version number, so when
+    running the script with input '0.42' the output will be '0.42+0'. (Disclaimer:
+    This script used to be more sophisticated but turned out to fail in some
+    situations, the +0 approach usually just works and the script is there to
+    provide a central place to handle version number management.)</li>
+
+    <li><code>lintian-junit-report</code>: run Debian package checks using <a
+    href="http://lintian.debian.org/">lintian</a> and report results in
+    xUnit/JUnit format (and also provide a plaintext copy of the output inside
+    file <code>lintian.txt</code>).</li>
+
+    <li><code>repository_checker</code>: provides simple access to
+    codename/repository and package listings (without the need to know how to
+    handle the reprepro repository tool) as well as an option to verify whether
+    Debian source packages match with binary package versions.</li>
+
+  </ul>
+
+  <section id="customization">
+  <div class="page-header">
+  <h2>Customization and Configuration</h2>
+  </div>
+  </section>
+
+  <p>jenkins-debian-glue and its scripts can be customized mainly
+  through <a href="/faq/#environment_variables">several environment
+  variables</a>.</p>
+
+  <p>You can either set environment variables <a href="#system_wide">system
+  wide</a> or inside Jenkins jobs (use <code>export VARIABLE=SETTING</code> in the
+  'Execute shell' step accordingly).</p>
+
+
+  <section id="system_wide">
+  <div class="page-header">
+  <h3>System wide via /etc/jenkins/debian_glue</h3>
+  </div>
+  </section>
+
+  <p>The following settings are supposed to be configured in
+  <code>/etc/jenkins/debian_glue</code>:</p>
+
+  <ul>
+  <li><code>KEYID</code>: setting this variable automatically signs repository with the specified GnuPG key ID. Please notice that already existing repositories won't be touched. If you set up a GnuPG key and the <i>KEYID</i> configuration after a repository was created (will be done on first execution of <i>build-and-provide-package</i> for a given binary job) make sure to manually add <i>SignWith: ${KEYID}</i> to your repository configuration ("//srv/repository/conf/distributions//" by default).
+
+  </li>
+  <li><code>MAINARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
+
+  </li>
+  <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "//srv/repository//".
+
+  </li>
+  <li><code>TRUNKRELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNKRELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
+  </li>
+  </ul>
+
+
+  <section id="build-and-provide-package">
+  <div class="page-header">
+  <h3>Supported in build-and-provide-package</h3>
+  </div>
+  </section>
+
+  <p>The following settings are supported by
+  <code>build-and-provide-package</code>:</p>
+
+  <ul>
+
+    <li><code>architecture</code>: controls for which architectures Debian
+    packages should be built.</li>
+
+    <li><code>distribution</code>: controls Debian version that should be used for
+    the cowbuilder environment (defaults to the host's distribution if
+    unset).</li>
+
+    <li><code>release</code>: install Debian package in repository name as
+    specified via "$release" instead of the default (being $REPOS), see "<i>Can I
+    collect multiple Debian packages in one single repository?</i>" in the FAQ
+    section for further details.</li>
+
+    <li><code>BASEPATH</code>: use specified directory as base directory for
+    further actions. Defaults to "${WORKSPACE}" if unset. Adjust it if you e.g.
+    have a customized "Target directory" in the "Copy artifacts from another
+    project" configuration.</li>
+
+    <li><code>BUILDONLY</code>: execute the steps building Debian binary
+    package(s) but skip the repository setup/inclusion steps (useful for building
+    the package(s) on slave nodes and including the result on a different node
+    later then)</li>
+
+    <li><code>COMPONENTS</code>: the specified repository components will be
+    enabled when creating a new cowbuilder base.cow. If unset defaults to
+    pbuilder's defaults (the underlying system of cowbuilder). Notice that on
+    Ubuntu systems <i>COMPONENTS</i> will be automatically set to "main universe"
+    (if <i>COMPONENTS</i> isn't set yet) to work around a cowdancer issue.</li>
+
+    <li><code>COWBUILDERBASE</code>: set path for cowbuilder's base.cow, defaults
+    to //var/cache/pbuilder/base-${COWBUILDERDIST}-${arch}.cow/ whereas
+    <i>COWBUILDERDIST</i> depends on its according variable and <i>arch</i>
+    depends on <i>architecture</i> (though doesn't match it if it's set to
+    "all").</li>
+
+    <li><code>COWBUILDERDIST</code>: distribution that should be used for creating
+    the cowbuilder base.cow. If <i>distribution</i> is set COWBUILDERDIST defaults
+    to that, otherwise defaults to the currently running distribution and if that
+    can't be determined then falls back to "sid" (being Debian/unstable).</li>
+
+    <li><code>PROVIDEONLY</code>: skip the steps building Debian binary package(s)
+    and just run the repository setup/inclusion steps (useful if building the
+    package(s) takes place on slave nodes and the result should by included in
+    repository/repositories on a specific node then)</li>
+
+    <li><code>REPOS</code>: controls the repository name used for the binary job.
+    Defaults to the Jenkins job name without trailing "<i>-binaries</i>" and
+    without trailing "<i>-repos</i>".</li>
+
+    <li><code>SUDOCMD</code>: if this variable is set then reprepro and related
+    actions will be executed under $SUDOCMD. If the jenkins user doesn't have
+    write permissions to the repository and related settings then you might
+    consider setting "export SUDOCMD=sudo" in your Build step.</li>
+
+  </ul>
+
+
+  <section id="generate-git-snapshot">
+  <div class="page-header">
+  <h3>Supported in generate-git-snapshot</h3>
+  </div>
+  </section>
+
+  <p>The following settings are supported by
+  <code>generate-git-snapshot</code>:</p>
+
+  <ul>
+
+    <li><code>DEBEMAIL</code>: user configuration to be used for generating new
+    entries in debian/changelog (defaults to "jenkins-debian-glue Autobuilder
+    &lt;jenkins@example.org&gt;")</li>
+
+    <li><code>DCHOPTS</code>: use custom git-dch options instead of the
+    defaults.</li>
+
+    <li><code>DCHEXTRAOPTS</code>: use additional custom git-dch options.</li>
+
+    <li><code>SKIP_DCH</code>: do not modify debian/changelog at all,
+    e.g. to build a branch as-is (available since jenkins-debian-glue v0.4.0)</li>
+
+  </ul>
+
+
+  <section id="generate-reprepro-codename">
+  <div class="page-header">
+  <h3>Supported in generate-reprepro-codename</h3>
+  </div>
+  </section>
+
+  <p>The following settings are supported by <code>generate-reprepro-codename</code>:</p>
+
+  <ul>
+
+    <li><code>SUDOCMD</code>: if this variable is set then reprepro and related
+    actions will be executed under $SUDOCMD. If the jenkins user doesn't have
+    write permissions to the repository and related settings then you might
+    consider setting "export SUDOCMD=sudo" in your Build step.</li>
+
+  </ul>
+
+
+  <section id="generate-svn-snapshot">
+  <div class="page-header">
+  <h3>Supported in generate-svn-snapshot</h3>
+  </div>
+  </section>
+
+  <p>The following settings are supported by
+  <code>generate-svn-snapshot</code>:</p>
+
+  <ul>
+
+    <li><code>DEBEMAIL</code>: user configuration to be used for generating new
+    entries in debian/changelog (defaults to "jenkins-debian-glue Autobuilder
+    &lt;jenkins@example.org&gt;")</li>
+
+  </ul>
+
+
+  <section id="tips_and_tricks">
+  <div class="page-header">
+  <h2>Tips and Tricks</h2>
+  </div>
+  </section>
+
+  <ul>
+
+    <li>Reduce disk usage: enable "<i>Discard Old Builds</i>" and set "<i>Max #
+    of builds to keep</i>" to something like 15 to keep disk usage at a sane
+    level.</li>
+
+    <li>Install and use the <a
+        href="https://wiki.jenkins-ci.org/display/JENKINS/Timestamper">Timestamper
+        Plugin</a> to get the 'Add timestamps to the Console Output' option in
+    your Jenkins job configuration. This is very useful for tracing performance
+    issues and timing problems.</li>
+
+    <li>Install and use the <a
+        href="https://wiki.jenkins-ci.org/display/JENKINS/Configuration+Slicing+Plugin">Configuration
+        Slicing Plugin</a> to perform mass configuration of your source and
+    binaries jobs.</li>
+
+  </ul>
+
+  <a href="https://github.com/mika/jenkins-debian-glue"><img
+      style="position: absolute; top: 40px; right: 0; border: 0;"
+      src="/img/forkme_right_orange_ff7600.png"
+      alt="Fork me on GitHub"></a>
+
+  <hr>
+
+  <footer class="footer">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2012 Michael Prokop | <a href="http://michael-prokop.at/impressum/">Imprint</a></p>
+  </footer>
+
+</div> <!-- /container -->
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap-alert.js"></script>
+
+</body>
+</html>
