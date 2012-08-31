@@ -169,6 +169,39 @@ Description: branch to build (trunk, tags/...)
   <p>DONE! Now you should be able to choose the branch that should be used for
   building the Debian source package.</p>
 
+  <section id="different_repos_for_different_branches">
+  <div class="page-header">
+  <h2>Put different branches in different repos</h2>
+  </div>
+  </section>
+  Additionally to building Debian package based on a specific branch, you might want that
+  built packages are put in a branch-based repository as well.
+  To achieve that, start with adjusting the Artifact Deployer-Configuration like this:
+  
+  <p>
+  <img src="/img/artifact_deployer_branches.png" alt="Screenshot of artifact deployer settings for different branches">
+  </p>
+
+  <p>You should also choose "Trigger parameterized build on other projects" and add
+  "Current build parameters" to the parameters. This will make sure, that the chosen branch is
+  passed to the binary job. You can remove the usual "Build after other projects are built" trigger.</p>
+
+  <p>Next, proceed with the binary job. Start making it parameterized and accepting the branch
+  parameter as done in the source job.</p>
+
+  <p>Now edit the build commands to be as following:</p>
+
+  <pre class="example">
+  rm -rf ./* || true
+  export sources="${JENKINS_HOME}/userContent/${branch}/${JOB_NAME%-binaries*}-source"
+  export REPOS="${JOB_NAME%-binaries*}-${branch}-${distribution}"
+  /usr/bin/generate-reprepro-codename "${REPOS}"
+
+  /usr/bin/build-and-provide-package
+  </pre>
+
+  <p>Thats it. If you now trigger a build for your source job, it will ask your for the branch and
+  will put the resulting binaries and sources into a branch-specific repository.</p>
 
   <section id="scripts">
   <div class="page-header">
