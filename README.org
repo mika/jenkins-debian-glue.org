@@ -1,0 +1,4 @@
+This is the git repository for the [[http://jenkins-debian-glue.org/][jenkins-debian-glue.org]] web site.
+
+If you are interested in the source code of the jenkins-debian-glue project itself please head over to
+[[https://github.com/mika/jenkins-debian-glue][jenkins-debian-glue]] instead.
