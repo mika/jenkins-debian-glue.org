@@ -283,13 +283,13 @@ Description: branch to build (trunk, tags/...)
   <li><code>KEYID</code>: setting this variable automatically signs repository with the specified GnuPG key ID. Please notice that already existing repositories won't be touched. If you set up a GnuPG key and the <i>KEYID</i> configuration after a repository was created (will be done on first execution of <i>build-and-provide-package</i> for a given binary job) make sure to manually add <i>SignWith: ${KEYID}</i> to your repository configuration ("//srv/repository/conf/distributions//" by default).
 
   </li>
-  <li><code>MAINARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
+  <li><code>MAIN_ARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
 
   </li>
   <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "//srv/repository//".
 
   </li>
-  <li><code>TRUNKRELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNKRELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
+  <li><code>TRUNK_RELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNK_RELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
   </li>
   </ul>
 
