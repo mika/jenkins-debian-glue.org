@@ -283,13 +283,13 @@ Description: branch to build (trunk, tags/...)
   <li><code>KEYID</code>: setting this variable automatically signs repository with the specified GnuPG key ID. Please notice that already existing repositories won't be touched. If you set up a GnuPG key and the <i>KEYID</i> configuration after a repository was created (will be done on first execution of <i>build-and-provide-package</i> for a given binary job) make sure to manually add <i>SignWith: ${KEYID}</i> to your repository configuration ("//srv/repository/conf/distributions//" by default).
 
   </li>
-  <li><code>MAINARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
+  <li><code>MAIN_ARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
 
   </li>
   <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "//srv/repository//".
 
   </li>
-  <li><code>TRUNKRELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNKRELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
+  <li><code>TRUNK_RELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNK_RELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
   </li>
   </ul>
 
@@ -353,10 +353,10 @@ Description: branch to build (trunk, tags/...)
     Defaults to the Jenkins job name without trailing "<i>-binaries</i>" and
     without trailing "<i>-repos</i>".</li>
 
-    <li><code>SUDOCMD</code>: if this variable is set then reprepro and related
-    actions will be executed under $SUDOCMD. If the jenkins user doesn't have
+    <li><code>SUDO_CMD</code>: if this variable is set then reprepro and related
+    actions will be executed under $SUDO_CMD. If the jenkins user doesn't have
     write permissions to the repository and related settings then you might
-    consider setting "export SUDOCMD=sudo" in your Build step.</li>
+    consider setting "export SUDO_CMD=sudo" in your Build step.</li>
 
   </ul>
 
@@ -376,10 +376,10 @@ Description: branch to build (trunk, tags/...)
     entries in debian/changelog (defaults to "jenkins-debian-glue Autobuilder
     &lt;jenkins@example.org&gt;")</li>
 
-    <li><code>DCHOPTS</code>: use custom git-dch options instead of the
+    <li><code>DCH_OPTS</code>: use custom git-dch options instead of the
     defaults.</li>
 
-    <li><code>DCHEXTRAOPTS</code>: use additional custom git-dch options.</li>
+    <li><code>DCH_EXTRA_OPTS</code>: use additional custom git-dch options.</li>
 
     <li><code>SKIP_DCH</code>: do not modify debian/changelog at all,
     e.g. to build a branch as-is (available since jenkins-debian-glue v0.4.0)</li>
@@ -397,10 +397,10 @@ Description: branch to build (trunk, tags/...)
 
   <ul>
 
-    <li><code>SUDOCMD</code>: if this variable is set then reprepro and related
-    actions will be executed under $SUDOCMD. If the jenkins user doesn't have
+    <li><code>SUDO_CMD</code>: if this variable is set then reprepro and related
+    actions will be executed under $SUDO_CMD. If the jenkins user doesn't have
     write permissions to the repository and related settings then you might
-    consider setting "export SUDOCMD=sudo" in your Build step.</li>
+    consider setting "export SUDO_CMD=sudo" in your Build step.</li>
 
   </ul>
 
