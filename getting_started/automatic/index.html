@@ -66,6 +66,10 @@
     </a>
   </div>
 
+  <!--
+  http://wiki.debian.org/Cloud/AmazonEC2Image
+  -->
+
   <p>All you need to do to automatically deploy the stack is <strong>execute the following two commands</strong>:</p>
 
 <pre>
@@ -102,14 +106,15 @@ Now point your browser to http://$SERVER_IP:8080
     change it.</strong>
   </div>
 
-  <p>Return to the start page again and go to the <i>jenkins-debian-glue-source</i>
-  Jenkins job and select <i>Build now</i>. A few seconds later the job should be
-  finished and automatically triggers the <i>jenkins-debian-glue-binaries</i>
-  Jenkins job. This will take a while for its first run (setting up the
+  <p>Return to the start page again and go to the
+  <i>jenkins-debian-glue-source</i> Jenkins job and select <i>Build now</i>. A
+  few seconds later the job should be finished and automatically triggers the
+  <i>jenkins-debian-glue-binaries</i> and <i>jenkins-debian-glue-piuparts</i>
+  Jenkins jobs. This will take a while for its first run (setting up the
   cowbuilder environment for you).</p>
 
   <p>Once the <i>jenkins-debian-glue-binaries</i> Jenkins job has finished as
-  well you should have two Jenkins jobs marked as blue (AKA success):</p>
+  well you should have Jenkins jobs marked as blue (AKA success):</p>
 
   <ul class="thumbnails">
   <li class="span3">
