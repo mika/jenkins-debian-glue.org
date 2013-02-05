@@ -286,11 +286,16 @@ Description: branch to build (trunk, tags/...)
   <li><code>MAIN_ARCHITECTURE</code>: if you are building Debian packages for more than one architecture you can control which architecture should be used as main one. The main architecture setting controls which architecture should be used as the one providing the architecture independent Debian packages (like <i>foobar0.42-1all.deb</i>). If unset it defaults to the architecture your build system is running.
 
   </li>
-  <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "//srv/repository//".
 
-  </li>
+  <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "//srv/repository//".</li>
+
+  <li><code>RELEASE_REPOSITORY</code>: the directory where reprepro's release repository is located.
+  Relevant only if the <a href="#build-and-provide-package"><em>$release</em> setting</a> is in use.
+  If unset defaults to <em>${REPOSITORY}/release/${release}</em>. Available since jenkins-debian-glue v0.5.0.</li>
+
   <li><code>TRUNK_RELEASE</code>: if you want to get a copy of all generated Debian packages in one single distribution you can set <i>TRUNK_RELEASE</i> to something like "<i>release-trunk</i>". The repository will be automatically set up if it doesn't exist yet.
   </li>
+
   </ul>
 
 
@@ -313,8 +318,8 @@ Description: branch to build (trunk, tags/...)
     unset).</li>
 
     <li><code>release</code>: install Debian package in repository name as
-    specified via "$release" instead of the default (being $REPOS), see "<i>Can I
-    collect multiple Debian packages in one single repository?</i>" in the FAQ
+    specified via "$release" instead of the default (being $REPOS), see "<a href="/faq/#single_repository"><i>Can I
+    collect multiple Debian packages in one single repository?</i>" in the FAQ</a>
     section for further details.</li>
 
     <li><code>BASEPATH</code>: use specified directory as base directory for
