@@ -346,9 +346,10 @@ jenkins ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot
   turns out to be very useful for inclusion in Continuous Integration/Delivery
   infrastructures.</p>
 
-  <p>To enable Lintian reports for your jenkins-debian-glue jobs add the
-  following "<i>Execute shell</i>" build step at the end of the build steps in
-  your *-source and *-binaries Jenkins jobs:</p>
+  <p>To enable Lintian reports for your jenkins-debian-glue jobs install the
+  <em>jenkins-debian-glue-buildenv-lintian</em> package, add the following "<i>Execute
+      shell</i>" build step at the end of the build steps in your *-source and
+  *-binaries Jenkins jobs:</p>
 
 <pre>
 mkdir -p report
