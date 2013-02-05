@@ -352,13 +352,18 @@ sudo /usr/bin/generate-reprepro-codename "${REPOS}"
   </section>
 
   <p>Yes. This feature is provided through so called release builds. In release
-  builds you add a release repository name through the "<i>$release</i>" variable
-  to the source job which is then handed over to the binaries job. The binaries
-  job then takes care of installing the Debian packages to the repository as
-  specified by the "<i>$release</i>" variable instead of installing them into
-  their own repository. This feature is especially handy if you trigger several
-  Jenkins jobs from a central place (like your own dashboard) to get a full
-  release build.</p>
+  builds you add a release repository name through the "<i>$release</i>"
+  variable to the source job which is then handed over to the binaries job. The
+  binaries job then takes care of installing the Debian packages to the
+  repository as specified by the "<i>$release</i>" variable instead of
+  installing them into their own repository. This feature is especially handy if
+  you trigger several Jenkins jobs for different (Debian) packages - e.g. from a
+  central place (like your own dashboard) - and want to collect all of them in
+  one single place (e.g. to get a full release build).</p>
+
+  <p>NOTE: Starting with version 0.5.0 of jenkins-debian-glue it's possible
+  to set the path for the release repository using <em>$RELEASE_REPOSITORY</em> (if
+  unset defaults to <em>${REPOSITORY}/release/${release}</em>).</p>
 
   <p>First of all make sure you have the <a
   href="https://wiki.jenkins-ci.org/display/JENKINS/Parameterized+Trigger+Plugin">Parameterized
