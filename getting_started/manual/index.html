@@ -322,6 +322,12 @@ Target directory:
 jenkins ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot
 </pre>
 
+<p>To make sure DEB_BUILD_OPTIONS is correctly propagated to cowbuilder, add the following line to the sudo configuration:</p>
+
+<pre>
+Defaults  env_keep+="DEB_*"
+</pre>
+
   <p>Create <code>/srv/repository/</code> and provide write permissions to
   jenkins user:</p>
 
