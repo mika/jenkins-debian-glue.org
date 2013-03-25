@@ -350,7 +350,10 @@ Defaults  env_keep+="DEB_* DIST"
 
 <pre>
 mkdir -p report
+# For the source package:
 /usr/bin/lintian-junit-report *.dsc &gt; report/lintian.xml
+# or, for the binary package:
+/usr/bin/lintian-junit-report *.changes &gt; report/lintian.xml
 </pre>
 
   <p>and add <code>lintian.txt</code> (no it's not a typo) to the list of
