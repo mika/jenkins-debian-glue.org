@@ -354,9 +354,17 @@ Description: branch to build (trunk, tags/...)
     package(s) takes place on slave nodes and the result should by included in
     repository/repositories on a specific node then)</li>
 
+    <li><code>REMOVE_FROM_RELEASE</code>: remove packages from a $release before
+    processing incoming. This allows to rebuild and provide versions already
+    existent in the release repository they are built for. (Available since
+    jenkins-debian-glue v0.6.0)</li>
+
     <li><code>REPOS</code>: controls the repository name used for the binary job.
     Defaults to the Jenkins job name without trailing "<i>-binaries</i>" and
     without trailing "<i>-repos</i>".</li>
+
+    <li><code>SKIP_PACKAGE_FROM_REMOVAL</code>: skip specific packages from
+    repository removal (available since jenkins-debian-glue v0.6.0)</li>
 
     <li><code>SUDO_CMD</code>: if this variable is set then reprepro and related
     actions will be executed under $SUDO_CMD. If the jenkins user doesn't have
@@ -385,6 +393,10 @@ Description: branch to build (trunk, tags/...)
     defaults.</li>
 
     <li><code>DCH_EXTRA_OPTS</code>: use additional custom git-dch options.</li>
+
+    <li><code>PRE_SOURCE_HOOK</code>: if set the script pointed by
+    PRE_SOURCE_HOOK will be executed before generation of the Debian source
+    package. (Available since jenkins-debian-glue v0.6.0)</li>
 
     <li><code>SKIP_DCH</code>: do not modify debian/changelog at all,
     e.g. to build a branch as-is (available since jenkins-debian-glue v0.4.0)</li>
@@ -424,6 +436,10 @@ Description: branch to build (trunk, tags/...)
     <li><code>DEBEMAIL</code>: user configuration to be used for generating new
     entries in debian/changelog (defaults to "jenkins-debian-glue Autobuilder
     &lt;jenkins@example.org&gt;")</li>
+
+    <li><code>PRE_SOURCE_HOOK</code>: if set the script pointed by
+    PRE_SOURCE_HOOK will be executed before generation of the Debian source
+    package. (Available since jenkins-debian-glue v0.6.0)</li>
 
   </ul>
 
