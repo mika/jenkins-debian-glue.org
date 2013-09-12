@@ -314,13 +314,11 @@ Target directory:
 
 <pre>
 jenkins ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot
+Defaults env_keep+="DEB_* DIST"
 </pre>
 
-<p>To make sure DEB_BUILD_OPTIONS or DIST are correctly propagated to cowbuilder, add the following line to the sudo configuration:</p>
-
-<pre>
-Defaults  env_keep+="DEB_* DIST"
-</pre>
+  <p>The second line makes sure that DEB_* and DIST environment variables are propagated
+  to cowbuilder.</p>
 
   <p>Create <code>/srv/repository/</code> and provide write permissions to
   jenkins user:</p>
