@@ -322,12 +322,12 @@ Description: branch to build (trunk, tags/...)
     collect multiple Debian packages in one single repository?</i>" in the FAQ</a>
     section for further details.</li>
 
-    <li><code>BASEPATH</code>: use specified directory as base directory for
+    <li><code>BASE_PATH</code>: use specified directory as base directory for
     further actions. Defaults to "${WORKSPACE}" if unset. Adjust it if you e.g.
     have a customized "Target directory" in the "Copy artifacts from another
     project" configuration.</li>
 
-    <li><code>BUILDONLY</code>: execute the steps building Debian binary
+    <li><code>BUILD_ONLY</code>: execute the steps building Debian binary
     package(s) but skip the repository setup/inclusion steps (useful for building
     the package(s) on slave nodes and including the result on a different node
     later then)</li>
@@ -338,18 +338,18 @@ Description: branch to build (trunk, tags/...)
     Ubuntu systems <i>COMPONENTS</i> will be automatically set to "main universe"
     (if <i>COMPONENTS</i> isn't set yet) to work around a cowdancer issue.</li>
 
-    <li><code>COWBUILDERBASE</code>: set path for cowbuilder's base.cow, defaults
+    <li><code>COWBUILDER_BASE</code>: set path for cowbuilder's base.cow, defaults
     to //var/cache/pbuilder/base-${COWBUILDERDIST}-${arch}.cow/ whereas
     <i>COWBUILDERDIST</i> depends on its according variable and <i>arch</i>
     depends on <i>architecture</i> (though doesn't match it if it's set to
     "all").</li>
 
-    <li><code>COWBUILDERDIST</code>: distribution that should be used for creating
-    the cowbuilder base.cow. If <i>distribution</i> is set COWBUILDERDIST defaults
+    <li><code>COWBUILDER_DIST</code>: distribution that should be used for creating
+    the cowbuilder base.cow. If <i>distribution</i> is set COWBUILDER_DIST defaults
     to that, otherwise defaults to the currently running distribution and if that
     can't be determined then falls back to "sid" (being Debian/unstable).</li>
 
-    <li><code>PROVIDEONLY</code>: skip the steps building Debian binary package(s)
+    <li><code>PROVIDE_ONLY</code>: skip the steps building Debian binary package(s)
     and just run the repository setup/inclusion steps (useful if building the
     package(s) takes place on slave nodes and the result should by included in
     repository/repositories on a specific node then)</li>
