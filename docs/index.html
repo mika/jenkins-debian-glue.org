@@ -371,18 +371,20 @@ Description: branch to build (trunk, tags/...)
     write permissions to the repository and related settings then you might
     consider setting "export SUDO_CMD=sudo" in your Build step.</li>
 
-    <li><code>USE_FREIGHT</code>: if this variable is set then Freight will be used
-    instead of reprepro as package repository management tool. By default, packages
-    will be stored in /var/lib/freight and /var/cache/freight, as mentioned in the
-    freight documentation. You can customize the paths using the variables FREIGHT_BASE
-    and FREIGHT_REPOSITORY. Note: you need <a href="https://github.com/rcrowley/freight">freight</a>
-    to be installed on your system.
+    <li><code>USE_FREIGHT</code>: if this variable is set then
+    <a href="https://github.com/rcrowley/freight">Freight</a> will be used instead of
+    Reprepro as package repository management tool. With the advantage, that you are
+    able to keep multiple versions of a Debian package in the repository.
+    
+    By default, packages will be stored in /var/lib/freight and /var/cache/freight, as
+    mentioned in the Freight documentation. You can customize the paths using the variables
+    FREIGHT_BASE and FREIGHT_REPOSITORY. Note: you need freight to be installed on your system.
     </li>
    <li><code>FREIGHT_BASE</code>: the base path under which freight repositories should
    be created. Eg. set this to /srv/freight and you will end up with /srv/freight/default
-   as the default freight destination.
+   as the default freight destination. See FREIGHT_REPOSITORY for further customization.
    </li>
-   <li><code>FREIGHT_REPOSITORY</code>Customize the fright repository name. If set and
+   <li><code>FREIGHT_REPOSITORY</code>: customize the fright repository name. If set and
    FREIGHT_BASE is not set, packages will end up in /srv/freight/$FREIGHT_REPOSITORY. If
    FREIGHT_BASE is set, you would end up with a directory structure of $FREIGHT_BASE/FREIGHT_REPOSITORY.
    </li>
