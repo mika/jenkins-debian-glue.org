@@ -339,8 +339,8 @@ Description: branch to build (trunk, tags/...)
     (if <i>COMPONENTS</i> isn't set yet) to work around a cowdancer issue.</li>
 
     <li><code>COWBUILDER_BASE</code>: set path for cowbuilder's base.cow, defaults
-    to //var/cache/pbuilder/base-${COWBUILDERDIST}-${arch}.cow/ whereas
-    <i>COWBUILDERDIST</i> depends on its according variable and <i>arch</i>
+    to /var/cache/pbuilder/base-${COWBUILDER_DIST}-${arch}.cow/ whereas
+    <i>COWBUILDER_DIST</i> depends on its according variable and <i>arch</i>
     depends on <i>architecture</i> (though doesn't match it if it's set to
     "all").</li>
 
