@@ -63,6 +63,7 @@
     <li><a href="#initial_cowbuilder_fails">Building the initial cowbuilder environment fails</a></li>
     <li><a href="#single_repository">Can I collect multiple Debian packages in one single repository?</a></li>
     <li><a href="#foreign_arch_builds">How do I build Debian packages for specific architectures/distributions which require specific features on a build host?</a></li>
+    <li><a href="#git_snapshot_upstream">Executing generate-git-snapshot fails with 'Not a valid object name upstream/...'</a></li>
   </ul>
 
   <hr>
@@ -421,6 +422,32 @@ release=${release}
   <p>This should give you a Matrix job execution like:</p>
 
   <p><img src="/img/multiarch_matrix_build_result.png"  alt="Screenshot of matrix build result" /></p>
+
+  <section id="git_snapshot_upstream">
+  <div class="page-header">
+  <h2>Executing generate-git-snapshot fails with 'Not a valid object name upstream/...'</h2>
+  </div>
+  </section>
+
+  <p>The *-source job using generate-git-snapshot might fail with:</p>
+
+<pre class="example">
++ git-buildpackage -nc --git-force-create --git-ignore-new --git-ignore-branch -S -us -uc --git-verbose [...]
+gbp:debug: ['git', 'rev-parse', '--show-cdup']
+gbp:debug: ['git', 'rev-parse', '--is-bare-repository']
+gbp:debug: /bin/true [] []
+gbp:debug: ['git', 'symbolic-ref', 'HEAD']
+gbp:debug: ['git', 'show-ref', 'refs/heads/jenkins-debian-glue-buildbranch18981']
+gbp:debug: ['git', 'show-ref', 'refs/heads/pristine-tar']
+gbp:debug: ['git', 'ls-tree', 'upstream/0.42']
+fatal: Not a valid object name upstream/0.42
+Build step 'Execute shell' marked build as failure
+</pre>
+
+  <p>This means you're lacking the according tag in your Git repository ('upstream/0.42' in the
+  above example). generate-git-snapshot assumes you're using <a
+  href="http://honk.sigxcpu.org/projects/git-buildpackage/manual-html/gbp.import.html#GBP.BRANCH.NAMING">the
+  default git-buildpackage workflow</a>.</p>
 
   <hr>
 
