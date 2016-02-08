@@ -55,7 +55,7 @@
 Visit the source Job and choose "<i>Build Now</i>". This will start building the Debian source package and if that works as expected it will automatically trigger building the Debian binary package(s). The first run might take some time because you're checking out the source from your VCS for the first time and setting up the cowbuilder environment also takes some time. Once you're past this stage rebuilding should be damn fast, just depending on your network and system speed.
 </p>
 <p>
-To use the local Debian repository just add an entry to your //etc/apt/sources.list.d/foobar.list/, like:
+To use the local Debian repository just add an entry to your /etc/apt/sources.list.d/foobar.list/, like:
 </p>
 <pre class="example">
 deb file:/srv/repository/ foobar main
@@ -71,7 +71,7 @@ ln -s /srv/repository/ /var/www/debian
 
 
 <p>
-and point //etc/apt/sources.list/foobar.list/ to it:
+and point /etc/apt/sources.list/foobar.list/ to it:
 </p>
 <pre class="example">
 deb http://$JENKINS_SERVER/debian/ foobar main
