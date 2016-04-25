@@ -418,6 +418,10 @@ Description: branch to build (trunk, tags/...)
     <li><code>SKIP_DCH</code>: do not modify debian/changelog at all,
     e.g. to build a branch as-is (available since jenkins-debian-glue v0.4.0)</li>
 
+    <li><code>DCH_CHANGELOG_FILE</code>: if set the changelog file will be
+    read from the specified location. Needed if the (original) debian folder is 
+    not ./debian. (available since jenkins-debian-glue v0.18.0)</li>
+
   </ul>
 
 
