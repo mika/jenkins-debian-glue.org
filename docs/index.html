@@ -287,7 +287,7 @@ Description: branch to build (trunk, tags/...)
 
   </li>
 
-  <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "/srv/repository/".</li>
+  <li><code>DEFAULT_REPOSITORY</code>: the directory where your Debian repository will be placed at. Defaults to "/srv/repository/".</li>
 
   <li><code>RELEASE_REPOSITORY</code>: the directory where reprepro's release repository is located.
   Relevant only if the <a href="#build-and-provide-package"><em>$release</em> setting</a> is in use.
@@ -322,6 +322,10 @@ Description: branch to build (trunk, tags/...)
     collect multiple Debian packages in one single repository?</i>" in the FAQ</a>
     section for further details.</li>
 
+    <li><code>ADJUST_DISTRIBUTION_ONTHEFLY</code>: set the distribution in binary builds. If set, the
+   "Distribution" field in the .changes file is updated to <i>distribution</i> before the package(s)
+    are added to the repository. (Available since version v0.12.0)</li>
+
     <li><code>BASE_PATH</code>: use specified directory as base directory for
     further actions. Defaults to "${WORKSPACE}" if unset. Adjust it if you e.g.
     have a customized "Target directory" in the "Copy artifacts from another
@@ -349,10 +353,28 @@ Description: branch to build (trunk, tags/...)
     to that, otherwise defaults to the currently running distribution and if that
     can't be determined then falls back to "sid" (being Debian/unstable).</li>
 
+    <li><code>DEBOOTSTRAP</code>: set the debootstrap to use (e.g. deboostrap or qemu-debootstrap).</li>
+
+    <li><code>FORCE_BINARY_ONLY</code>: allow it to control DEBBUILDOPTS. Setting it to <i>all</i>
+    enables -A option othwerwise -B gets enabled.
+    This is useful when building with a label matrix config and then running
+    'export FORCE_BINARY_ONLY=$label' before invoking the build-and-provide-package script.</li>
+
     <li><code>PROVIDE_ONLY</code>: skip the steps building Debian binary package(s)
     and just run the repository setup/inclusion steps (useful if building the
     package(s) takes place on slave nodes and the result should by included in
     repository/repositories on a specific node then)</li>
+
+    <li><code>RELEASE_DISTRIBUTION</code>: set the distribution ("Codename")
+    for a release. (Available since jenkins-debian-glue v0.17.0)</li>
+
+    <li><code>RELEASE_REPOSITORIES</code>: is a space seperated list that can
+    be used to push built packages to one or more repoitories. For example iff release is set to "0.42-update":
+    <pre class="example">
+    RELEASE_REPOSITORIES="/srv/repository/release/ce/${release} /srv/repository/release/pro/${release}"
+    </pre>
+		In this example the package would be put into /srv/repository/release/ce/0.42-update and
+		/srv/repository/release/pro/0.42-update. (Available since jenkins-debian-glue v0.17.0)</li>
 
     <li><code>REMOVE_FROM_RELEASE</code>: remove packages from a $release before
     processing incoming. This allows to rebuild and provide versions already
@@ -363,8 +385,35 @@ Description: branch to build (trunk, tags/...)
     Defaults to the Jenkins job name without trailing "<i>-binaries</i>" and
     without trailing "<i>-repos</i>".</li>
 
+    <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at.
+    REPOSITORY overrides the global DEFAULT_REPOSITORY variable.
+    </li>
+
+    <li><code>REPOSITORY_EXTRA</code>: comma separated list of extra repositories to be used for
+    resolving dependencies when building. For example:
+    <pre class="example">
+    REPOSITORY_EXTRA="deb http://jenkins.grml.org/debian jenkins-debian-glue main,deb http://jenkins.grml.org/debian initramfs-tools main
+    </pre>
+    (Available since version 0.9.0)</li>
+
+    <li><code>REPOSITORY_EXTRA_KEYS</code>: comma separated list of URLs to gpg keys to be used for
+    authenticating packages. Might be required to be used in conjunction with REPOSITORY_EXTRA.
+    (Available since version 0.9.0)</li>
+
+    <li><code>REPREPRO_CMD</code>: specify the reprepro command to use. This can, also be used to
+    specify a wrapper script instead of calling reprepro directly (Available since version 0.17.0).</li>
+
+    <li><code>SKIP_AUTOPKGTEST_RESULTS</code>: skip any autopkgtest output handling</li>
+
     <li><code>SKIP_PACKAGE_FROM_REMOVAL</code>: skip specific packages from
     repository removal (available since jenkins-debian-glue v0.6.0)</li>
+
+    <li><code>SKIP_MISSING_BINARY_REMOVAL</code>: skip the removal of binary packages not belonging
+    to the currently built source package. This is required if multiple different packages are put
+		into the same repository. (available since jenkins-debian-glue &gt; v0.17.0)</li>
+
+    <li><code>SKIP_COWBUILDER_UPDATE</code>: don't run "cowbuilder --update" during build (available since
+    jenkins-debian-glue v0.16.0)</li>
 
     <li><code>SUDO_CMD</code>: if this variable is set then reprepro and related
     actions will be executed under $SUDO_CMD. If the jenkins user doesn't have
@@ -434,6 +483,9 @@ Description: branch to build (trunk, tags/...)
   <p>The following settings are supported by <code>generate-reprepro-codename</code>:</p>
 
   <ul>
+    <li><code>REPOSITORY</code>: the directory where your Debian repository will be placed at.
+    REPOSITORY overrides the global DEFAULT_REPOSITORY variable.
+    </li>
 
     <li><code>SUDO_CMD</code>: if this variable is set then reprepro and related
     actions will be executed under $SUDO_CMD. If the jenkins user doesn't have
