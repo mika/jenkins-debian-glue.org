@@ -50,75 +50,61 @@
   <p>The deployment script expects</p>
 
   <ul>
-    <li>a <strong>Debian</strong> system (<a href="http://www.debian.org/distrib/netinst">amd64</a> recommended), or</li>
+    <li>a <strong>Debian</strong> system (<a href="http://www.debian.org/distrib/netinst">amd64</a> recommended), <strong>or</strong></li>
     <li>a <strong>Ubuntu</strong> system (<a href="http://www.ubuntu.com/download/server">Ubuntu Server 18.04 LTS 64bit</a> or newer recommended)</li>
   </ul>
 
-  <p>with &gt;=512MB RAM and &gt;=2GB of free disk space.</p>
+  <p>with &gt;=512MB RAM and &gt;=4GB of free disk space.</p>
 
   <div class="alert">
     <button type="button" class="close" data-dismiss="alert" href="#">×</button>
-    <strong>Ubuntu Server 14.04 LTS, 16.04 + 18.04 LTS on Amazon EC2 are known to work fine out of the box.</strong>
-    <a href="http://aws.amazon.com/marketplace/pp/B07CQ33QKV">
-        <img src="/img/ubuntu_ec2.png" />
-    </a>
+    <strong>The <a href="https://ubuntu.com/aws">Ubuntu Server LTS on Amazon EC2</a> are known to work fine out of the box.</strong>
   </div>
 
   <div class="alert">
     <button type="button" class="close" data-dismiss="alert" href="#">×</button>
-    <strong><a href="http://wiki.debian.org/Cloud/AmazonEC2Image">Debian AMIs</a> are known to work fine as well (squeeze &gt;=6.0.7, wheezy, jessie, stretch, buster)</strong>
+    <strong>The <a href="http://wiki.debian.org/Cloud/AmazonEC2Image">Debian AMIs</a> are known to work fine (buster + bullseye)</strong>
   </div>
 
   <div class="alert">
     <button type="button" class="close" data-dismiss="alert" href="#">×</button>
-    <strong>The <a href="https://developers.google.com/compute/docs/operating-systems">Debian (>=wheezy) images on Google Compute Engine</a> are known to work fine out of the box.</strong>
+    <strong>The <a href="https://developers.google.com/compute/docs/operating-systems">Debian images on Google Compute Engine</a> are known to work fine out of the box.</strong>
   </div>
 
   <p>All you need to do to automatically deploy the stack is <strong>execute the following two commands</strong>:</p>
 
 <pre>
 wget https://raw.github.com/mika/jenkins-debian-glue/master/puppet/apply.sh
-sudo bash ./apply.sh your_password
+sudo bash ./apply.sh
 </pre>
 
   <p>This will take ~5 minutes (depending on network and disk speed).</p>
 
-  <p>After installation finished successfully you'll notice:</p>
+  <p>After installation finished successfully you should get:</p>
 
 <pre>
 Now point your browser to http://$SERVER_IP:8080
 </pre>
 
-  <p>Visiting your browser should give you the following screen:</p>
+  <p>Visiting your browser should give you the `<em>Unlock Jenkins</em>` screen (also see <a href="https://www.jenkins.io/doc/book/installing/linux/#unlocking-jenkins">upstream docs</a>).</p>
 
-  <ul class="thumbnails">
-  <li class="span3">
-    <a href="/img/jenkins_fresh.png" class="thumbnail">
-      <img src="/img/jenkins_fresh.png" alt="">
-    </a>
-  </li>
-  </ul>
+  <p>After providing the initial admin password (from <em>/var/lib/jenkins/secrets/initialAdminPassword</em>), continue with plugin installation, choose `Select plugins` and click `Install` button there.
+  If any plugins fail to install, this means that dependencies are missing (if so check the systems log for <em>Failed to install</em> and <a href="https://github.com/mika/jenkins-debian-glue/issues">please reports those</a>).</p>
+  Finally create an administrator user and choose the Jenkins URL for your system.</p>
 
-  <p>Now login with username <code>jenkins-debian-glue</code> and the password
-  you set in the <code>apply.sh</code> commandline ('your_password' in the example
-  above).</p>
+  <p>After finishing the setup dialog and restarting jenkins, you should be able to login with your newly created administrator user.</p>
 
-  <div class="alert">
-    <button type="button" class="close" data-dismiss="alert" href="#">×</button>
-    <strong>Do not forget to change your password! Visit</strong>
-    <code>http://$SERVER_IP:8080/user/jenkins-debian-glue/configure</code> <strong>to
-    change it.</strong>
-  </div>
+  <p><strong>NOTE:</strong> If any of the <i>jenkins-debian-glue-source</i>, <i>jenkins-debian-glue-binaries</i> or <i>jenkins-debian-glue-piuparts</i> Jenkins jobs are missing,
+  or execution fails at an early stage, Jenkins might have rewritten those Jenkins jobs. :( Executing `<em>sudo bash ./apply.sh --force</em>` should fix this.</p>
 
-  <p>Return to the start page again and go to the
-  <i>jenkins-debian-glue-source</i> Jenkins job and select <i>Build now</i>. A
+  <p>Go to the <i>jenkins-debian-glue-source</i> Jenkins job and select <i>Build now</i>. A
   few seconds later the job should be finished and automatically triggers the
   <i>jenkins-debian-glue-binaries</i> and <i>jenkins-debian-glue-piuparts</i>
   Jenkins jobs. This will take a while for its first run (setting up the
   cowbuilder environment for you).</p>
 
   <p>Once the <i>jenkins-debian-glue-binaries</i> Jenkins job has finished as
-  well you should have Jenkins jobs marked as blue (AKA success):</p>
+  well you should have Jenkins jobs marked as green or blue (AKA success):</p>
 
   <ul class="thumbnails">
   <li class="span3">
