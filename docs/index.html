@@ -363,6 +363,11 @@ Description: branch to build (trunk, tags/...)
     Defaults to the Jenkins job name without trailing "<i>-binaries</i>" and
     without trailing "<i>-repos</i>".</li>
 
+    <li><code>SKIP_COWBUILDER_UPDATE</code>: set to <code>'true'</code> to skip
+    updating the cowbuilder image. Introduced as a workaround to Hash Sum
+    mismatch that might be encountered when the remote apt mirror is being
+    synced (available since jenkins-debian-glue v0.16.0)</li>
+
     <li><code>SKIP_PACKAGE_FROM_REMOVAL</code>: skip specific packages from
     repository removal (available since jenkins-debian-glue v0.6.0)</li>
 
