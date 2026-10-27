@@ -114,8 +114,12 @@ sudo bash ./apply.sh
 
 </div> <!-- /container -->
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap-alert.js"></script>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-dismiss="alert"]');
+  if (b) b.closest('.alert').remove();
+});
+</script>
 
 </body>
 </html>
